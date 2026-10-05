@@ -12,7 +12,21 @@
 const SHEET_NAME = 'Feedback'
 const HEADERS = ['Дата', 'Имя', 'Контакт', 'Компания', 'Тема', 'Сообщение', 'Страница', 'reCAPTCHA score', 'Hostname']
 
+// ▶ Запускайте вручную именно эту функцию (выберите «setup» в списке рядом с кнопкой «Выполнить»).
+// Выдаёт разрешения, создаёт лист с заголовками и проверяет свойства скрипта.
+function setup() {
+  getSheet()
+  UrlFetchApp.fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'post', muteHttpExceptions: true })
+  const props = PropertiesService.getScriptProperties()
+  if (!props.getProperty('RECAPTCHA_SECRET')) throw new Error('Не задано свойство скрипта RECAPTCHA_SECRET')
+  console.log('Готово: лист «' + SHEET_NAME + '» создан, RECAPTCHA_SECRET задан. Можно разворачивать веб-приложение.')
+}
+
+// Вызывается веб-приложением при отправке формы. Вручную не запускать.
 function doPost(e) {
+  if (!e || !e.postData) {
+    throw new Error('doPost вызывается только веб-приложением. Для настройки запустите функцию setup.')
+  }
   try {
     const data = JSON.parse(e.postData.contents)
 
@@ -100,10 +114,4 @@ function safe(value) {
 
 function json(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)
-}
-
-// Запустите вручную из редактора один раз — выдаст разрешения и создаст лист с заголовками
-function setup() {
-  getSheet()
-  UrlFetchApp.fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'post', muteHttpExceptions: true })
 }

@@ -2,12 +2,12 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
-import Tooltip from '@mui/material/Tooltip'
+// import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 import BoltIcon from '@mui/icons-material/Bolt'
-import DownloadIcon from '@mui/icons-material/Download'
-import { techPdf } from '../content'
+// import DownloadIcon from '@mui/icons-material/Download'
+// import { techPdf } from '../content'
 import { requestFeedback } from '../lib/feedbackBus'
 import { glow, neon } from '../theme'
 
@@ -22,6 +22,7 @@ export default function Cta() {
           <Button variant="contained" size="large" startIcon={<BoltIcon />} onClick={() => requestFeedback('Запросить демо')}>
             Запросить демо
           </Button>
+          {/* TODO: вернуть, когда появится PDF (и раскомментировать импорты выше)
           <Tooltip title={techPdf ? '' : 'Скоро будет'}>
             <span>
               <Button
@@ -37,6 +38,7 @@ export default function Cta() {
               </Button>
             </span>
           </Tooltip>
+          */}
         </Stack>
       </Container>
     </Box>
