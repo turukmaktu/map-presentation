@@ -59,13 +59,13 @@ export const integrationSteps = [
   'Запуск и сопровождение',
 ]
 
-// TODO: заполнить реальными данными
 export const about = {
-  name: 'Ваше имя',
+  name: 'Ваше имя', // TODO: заполнить
+  avatar: 'jedi.jpg', // относительно public/
   facts: [
-    { value: 'XX лет', label: 'в 1С' },
-    { value: 'XX лет', label: 'в React' },
-    { value: 'XX+', label: 'интеграций' },
+    { value: '5 лет', label: 'в 1С' },
+    { value: '7 лет', label: 'в React' },
+    { value: '100+', label: 'интеграций' },
   ],
   quote: 'Я не продаю часы. Я показываю время. И да, я делаю это сам.',
 }
