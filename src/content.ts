@@ -28,7 +28,13 @@ export const problems = [
 // video: базовое имя в public/ (см. HoloFrame), ratio — пропорции кадра видео.
 // Роли: курьер — падаван, диспетчер — мастер-джедай.
 export const steps: { system: string; title: string; text: string; gif?: string; video?: string; ratio?: string }[] = [
-  { system: 'Bitrix', title: 'Зов Силы: заказ на сайте', text: 'Клиент оформляет заказ в Bitrix-шаблоне на React/MUI. CMS работает как прежде — баланс Силы не нарушен.' },
+  {
+    system: 'Bitrix',
+    title: 'Зов Силы: заказ на сайте',
+    text: 'Клиент оформляет заказ в Bitrix-шаблоне на React/MUI. CMS работает как прежде — баланс Силы не нарушен.',
+    video: 'videos/order-site',
+    ratio: '1078 / 1080',
+  },
   { system: '1С', title: 'Мастер прокладывает путь', text: 'Диспетчер-мастер собирает маршрут в 1С: drag&drop или прямо на карте.' },
   { system: 'Android', title: 'Падаван принимает миссию', text: 'Маршрут прилетает в Android-приложение — падаван жмёт «Поехали».' },
   { system: 'Android', title: 'Испытание в пути', text: 'Статусы, фото, подпись клиента — каждый шаг падавана фиксируется на месте.' },
