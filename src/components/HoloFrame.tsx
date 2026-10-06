@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import Box from '@mui/material/Box'
 import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
@@ -9,15 +10,59 @@ const scan = keyframes`
   to { transform: translateY(400%); }
 `
 
-type Props = { src?: string; alt: string; color?: string; label?: string }
+type Props = {
+  src?: string
+  // Базовое имя видео относительно public/, например 'videos/driver-ways'.
+  // Ожидаются файлы <base>.av1.mp4, <base>.h264.mp4, <base>.preview.mp4, <base>.poster.webp.
+  video?: string
+  ratio?: string
+  alt: string
+  color?: string
+  label?: string
+}
 
-// «Голографическая» рамка: сетка + свечение. Без src показывает скелетон.
-export default function HoloFrame({ src, alt, color = neon.blue, label = 'GIF скоро' }: Props) {
+// Зацикленное видео без звука: играет только пока видно на экране.
+function LoopVideo({ base, alt }: { base: string; alt: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
+  const url = import.meta.env.BASE_URL + base
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const observer = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) el.play().catch(() => {})
+      else el.pause()
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <Box
+      component="video"
+      ref={ref}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      poster={`${url}.poster.webp`}
+      aria-label={alt}
+      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+    >
+      <source src={`${url}.preview.mp4`} type="video/mp4" media="(max-width: 600px)" />
+      <source src={`${url}.av1.mp4`} type='video/mp4; codecs="av01.0.08M.08"' />
+      <source src={`${url}.h264.mp4`} type="video/mp4" />
+    </Box>
+  )
+}
+
+// «Голографическая» рамка: сетка + свечение. Без src/video показывает скелетон.
+export default function HoloFrame({ src, video, ratio = '16 / 10', alt, color = neon.blue, label = 'GIF скоро' }: Props) {
   return (
     <Box
       sx={{
         position: 'relative',
-        aspectRatio: '16 / 10',
+        aspectRatio: ratio,
         borderRadius: 2,
         overflow: 'hidden',
         border: `1px solid ${alpha(color, 0.5)}`,
@@ -34,7 +79,9 @@ export default function HoloFrame({ src, alt, color = neon.blue, label = 'GIF с
         },
       }}
     >
-      {src ? (
+      {video ? (
+        <LoopVideo base={video} alt={alt} />
+      ) : src ? (
         <Box
           component="img"
           src={import.meta.env.BASE_URL + src}

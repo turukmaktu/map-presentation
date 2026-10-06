@@ -13,7 +13,7 @@ import { glow, monoFont, neon } from '../theme'
 
 // Точки маршрута на мини-карте — по одной на этап.
 const route = [
-  [30, 30], [150, 50], [70, 100], [165, 135], [45, 175], [140, 210], [95, 245],
+  [30, 25], [150, 50], [70, 85], [165, 115], [45, 150], [150, 180], [60, 215], [125, 250],
 ] as const
 
 function RouteMap({ active }: { active: number }) {
@@ -58,7 +58,7 @@ export default function JediPath() {
   }, [])
 
   return (
-    <Section id="path" overline="Путь джедая" title="От заказа до отчёта — 7 шагов">
+    <Section id="path" overline="Путь джедая" title={`От зова Силы до архивов Храма — ${steps.length} шагов`}>
       <Grid container spacing={{ xs: 3, md: 6 }}>
         {/* Липкая навигация: карта маршрута + таймлайн (только десктоп) */}
         <Grid size={{ md: 4 }} sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -147,7 +147,9 @@ export default function JediPath() {
                     </Typography>
                     <Chip label={s.system} size="small" variant="outlined" color="primary" sx={{ fontFamily: monoFont }} />
                   </Box>
-                  <HoloFrame src={s.gif} alt={s.title} color={i === active ? neon.green : neon.blue} />
+                  <Box sx={s.video ? { maxWidth: 600 } : undefined}>
+                    <HoloFrame src={s.gif} video={s.video} ratio={s.ratio} alt={s.title} color={i === active ? neon.green : neon.blue} />
+                  </Box>
                   <Typography sx={{ mt: 1.5, color: 'text.secondary' }}>{s.text}</Typography>
                 </motion.div>
               </Box>
