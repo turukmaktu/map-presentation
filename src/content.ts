@@ -68,17 +68,6 @@ export const integrationSteps = [
   'Запуск и сопровождение',
 ]
 
-export const about = {
-  name: 'Ваше имя', // TODO: заполнить
-  avatar: 'jedi.jpg', // относительно public/
-  facts: [
-    { value: '5 лет', label: 'в 1С' },
-    { value: '7 лет', label: 'в React' },
-    { value: '100+', label: 'интеграций' },
-  ],
-  quote: 'Я не продаю часы. Я показываю время. И да, я делаю это сам.',
-}
-
 export const darkSide = [
   { title: 'SaaS-империя', text: 'Берёт 5% с каждого заказа. Навсегда.' },
   { title: 'Лицензионный флот', text: 'Каждый новый падаван — новая лицензия.' },

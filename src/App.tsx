@@ -1,5 +1,4 @@
 import ForceMeter from './components/ForceMeter'
-import About from './sections/About'
 import Cta from './sections/Cta'
 import DarkSide from './sections/DarkSide'
 import Feedback from './sections/Feedback'
@@ -22,7 +21,6 @@ export default function App() {
         <TechStack />
         <Savings />
         <LiveDemo />
-        <About />
         <DarkSide />
         <Cta />
         <Feedback />
