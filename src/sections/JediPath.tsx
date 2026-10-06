@@ -13,8 +13,13 @@ import { glow, monoFont, neon } from '../theme'
 
 // Точки маршрута на мини-карте — по одной на этап.
 const route = [
-  [30, 25], [150, 50], [70, 85], [165, 115], [45, 150], [150, 180], [60, 215], [125, 250],
+  [30, 30], [150, 50], [70, 100], [165, 135], [45, 175], [140, 210], [95, 245],
 ] as const
+
+const isPortrait = (ratio?: string) => {
+  const [w, h] = (ratio ?? '').split('/').map(Number)
+  return w < h
+}
 
 function RouteMap({ active }: { active: number }) {
   const all = route.map((p) => p.join(',')).join(' ')
@@ -147,9 +152,10 @@ export default function JediPath() {
                     </Typography>
                     <Chip label={s.system} size="small" variant="outlined" color="primary" sx={{ fontFamily: monoFont }} />
                   </Box>
-                  {/* Рамку показываем только когда есть медиа — без пустых заглушек */}
+                  {/* Рамку показываем только когда есть медиа — без пустых заглушек.
+                      Вертикальное видео с телефона — узкая рамка, остальные до 600px. */}
                   {(s.gif || s.video) && (
-                    <Box sx={s.video ? { maxWidth: 600, mb: 1.5 } : { mb: 1.5 }}>
+                    <Box sx={s.video ? { maxWidth: isPortrait(s.ratio) ? 320 : 600, mb: 1.5 } : { mb: 1.5 }}>
                       <HoloFrame src={s.gif} video={s.video} ratio={s.ratio} alt={s.title} color={i === active ? neon.green : neon.blue} />
                     </Box>
                   )}

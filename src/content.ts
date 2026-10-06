@@ -42,8 +42,13 @@ export const steps: { system: string; title: string; text: string; gif?: string;
     video: 'videos/create-route',
     ratio: '1060 / 1080',
   },
-  { system: 'Android', title: 'Падаван принимает миссию', text: 'Маршрут прилетает в Android-приложение — падаван жмёт «Поехали».' },
-  { system: 'Android', title: 'Испытание в пути', text: 'Статусы, фото, подпись клиента — каждый шаг падавана фиксируется на месте.' },
+  {
+    system: 'Android',
+    title: 'Падаван принимает миссию',
+    text: 'Маршрут прилетает в Android-приложение — падаван жмёт «Поехали».',
+    video: 'videos/android',
+    ratio: '1080 / 2400',
+  },
   {
     system: 'Bitrix',
     title: 'Контроль мидихлориан',
