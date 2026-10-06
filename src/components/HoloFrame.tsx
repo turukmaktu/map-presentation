@@ -16,6 +16,8 @@ type Props = {
   // Ожидаются файлы <base>.av1.mp4, <base>.h264.mp4, <base>.preview.mp4, <base>.poster.webp.
   video?: string
   ratio?: string
+  // Корпус смартфона вокруг экрана — для записей с телефона.
+  phone?: boolean
   alt: string
   color?: string
   label?: string
@@ -57,18 +59,29 @@ function LoopVideo({ base, alt }: { base: string; alt: string }) {
 }
 
 // «Голографическая» рамка: сетка + свечение. Без src/video показывает скелетон.
-export default function HoloFrame({ src, video, ratio = '16 / 10', alt, color = neon.blue, label = 'GIF скоро' }: Props) {
+export default function HoloFrame({ src, video, ratio = '16 / 10', phone, alt, color = neon.blue, label = 'GIF скоро' }: Props) {
   return (
     <Box
       sx={{
         position: 'relative',
         aspectRatio: ratio,
-        borderRadius: 2,
         overflow: 'hidden',
-        border: `1px solid ${alpha(color, 0.5)}`,
-        boxShadow: `0 0 24px ${alpha(color, 0.25)}, inset 0 0 32px ${alpha(color, 0.12)}`,
-        bgcolor: alpha(color, 0.04),
-        '&::before': {
+        ...(phone
+          ? {
+              // Тёмная рамка-корпус + тонкий неоновый контур и свечение снаружи; сетку не рисуем.
+              borderRadius: '36px',
+              border: '10px solid #05080d',
+              boxShadow: `0 0 0 1px ${alpha(color, 0.6)}, 0 0 36px ${alpha(color, 0.35)}, 0 24px 48px rgba(0, 0, 0, 0.5)`,
+              bgcolor: '#05080d',
+              transition: 'box-shadow .4s',
+            }
+          : {
+              borderRadius: 2,
+              border: `1px solid ${alpha(color, 0.5)}`,
+              boxShadow: `0 0 24px ${alpha(color, 0.25)}, inset 0 0 32px ${alpha(color, 0.12)}`,
+              bgcolor: alpha(color, 0.04),
+            }),
+        '&::before': phone ? undefined : {
           content: '""',
           position: 'absolute',
           inset: 0,

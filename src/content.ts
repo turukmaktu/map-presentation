@@ -25,9 +25,10 @@ export const problems = [
 ]
 
 // gif: путь относительно public/, например 'gifs/step-1.gif'. Без gif/video шаг выводится только текстом.
-// video: базовое имя в public/ (см. HoloFrame), ratio — пропорции кадра видео.
+// video: базовое имя в public/ (см. HoloFrame), ratio — пропорции кадра видео,
+// phone: запись с экрана телефона — показывается по центру в корпусе смартфона.
 // Роли: курьер — падаван, диспетчер — мастер-джедай.
-export const steps: { system: string; title: string; text: string; gif?: string; video?: string; ratio?: string }[] = [
+export const steps: { system: string; title: string; text: string; gif?: string; video?: string; ratio?: string; phone?: boolean }[] = [
   {
     system: 'Bitrix',
     title: 'Зов Силы: заказ на сайте',
@@ -48,6 +49,7 @@ export const steps: { system: string; title: string; text: string; gif?: string;
     text: 'Маршрут прилетает в Android-приложение — падаван жмёт «Поехали».',
     video: 'videos/android',
     ratio: '1080 / 2400',
+    phone: true,
   },
   {
     system: 'Bitrix',
