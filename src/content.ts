@@ -58,9 +58,13 @@ export const steps: { system: string; title: string; text: string; gif?: string;
     video: 'videos/driver-ways',
     ratio: '1072 / 1080',
   },
-  { system: '1С', title: 'Миссия выполнена', text: 'Маршрут закрыт — изменения мгновенно отражаются в 1С.' },
-  { system: '1С', title: 'Архивы Храма', text: '1С сама создаёт документы доставки. Никакого Excel — только летописи джедаев.' },
-  { system: '1С ↔ Bitrix', title: 'Сила течёт в обе стороны', text: 'Создали заказ в 1С — он виден на сайте. Связь двусторонняя.' },
+  {
+    system: '1С ↔ Bitrix',
+    title: 'Сила течёт в обе стороны',
+    text: 'Создали заказ в 1С — он виден на сайте. Связь двусторонняя.',
+    video: 'videos/order-bridge',
+    ratio: '1920 / 1072',
+  },
 ]
 
 export const stack = [
