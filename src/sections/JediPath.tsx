@@ -111,7 +111,7 @@ export default function JediPath() {
                 ref={(el: HTMLDivElement | null) => {
                   refs.current[i] = el
                 }}
-                sx={{ position: 'relative', mb: { xs: 6, md: 10 }, scrollMarginTop: 80 }}
+                sx={{ position: 'relative', mb: s.gif || s.video ? { xs: 6, md: 10 } : { xs: 4, md: 6 }, scrollMarginTop: 80 }}
               >
                 <Box
                   sx={{
@@ -147,10 +147,13 @@ export default function JediPath() {
                     </Typography>
                     <Chip label={s.system} size="small" variant="outlined" color="primary" sx={{ fontFamily: monoFont }} />
                   </Box>
-                  <Box sx={s.video ? { maxWidth: 600 } : undefined}>
-                    <HoloFrame src={s.gif} video={s.video} ratio={s.ratio} alt={s.title} color={i === active ? neon.green : neon.blue} />
-                  </Box>
-                  <Typography sx={{ mt: 1.5, color: 'text.secondary' }}>{s.text}</Typography>
+                  {/* Рамку показываем только когда есть медиа — без пустых заглушек */}
+                  {(s.gif || s.video) && (
+                    <Box sx={s.video ? { maxWidth: 600, mb: 1.5 } : { mb: 1.5 }}>
+                      <HoloFrame src={s.gif} video={s.video} ratio={s.ratio} alt={s.title} color={i === active ? neon.green : neon.blue} />
+                    </Box>
+                  )}
+                  <Typography sx={{ color: 'text.secondary' }}>{s.text}</Typography>
                 </motion.div>
               </Box>
             ))}

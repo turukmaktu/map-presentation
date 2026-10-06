@@ -24,7 +24,7 @@ export const problems = [
   { pain: 'Отчёты собираются в Excel', fix: 'Автодокументы в 1С' },
 ]
 
-// gif: путь относительно public/, например 'gifs/step-1.gif'. Пока пусто — показывается скелетон.
+// gif: путь относительно public/, например 'gifs/step-1.gif'. Без gif/video шаг выводится только текстом.
 // video: базовое имя в public/ (см. HoloFrame), ratio — пропорции кадра видео.
 // Роли: курьер — падаван, диспетчер — мастер-джедай.
 export const steps: { system: string; title: string; text: string; gif?: string; video?: string; ratio?: string }[] = [
