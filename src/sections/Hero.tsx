@@ -10,6 +10,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { motion } from 'motion/react'
 import Terminal from '../components/Terminal'
 import { hero } from '../content'
+import { requestFeedback } from '../lib/feedbackBus'
 import { glow, neon } from '../theme'
 
 // Звёздное небо из радиальных градиентов — без картинок и canvas.
@@ -58,7 +59,7 @@ export default function Hero() {
               </Typography>
               <Typography sx={{ color: 'text.secondary', mb: 4, maxWidth: 520, fontSize: '1.05rem' }}>{hero.subtitle}</Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button variant="contained" size="large" startIcon={<BoltIcon />} href="#demo">
+                <Button variant="contained" size="large" startIcon={<BoltIcon />} onClick={() => requestFeedback('Запросить демо')}>
                   Почувствовать силу
                 </Button>
                 <Button variant="outlined" size="large" endIcon={<KeyboardArrowDownIcon />} href="#path">

@@ -5,7 +5,6 @@ import Feedback from './sections/Feedback'
 import Footer from './sections/Footer'
 import Hero from './sections/Hero'
 import JediPath from './sections/JediPath'
-import LiveDemo from './sections/LiveDemo'
 import ProblemSolution from './sections/ProblemSolution'
 import Savings from './sections/Savings'
 import TechStack from './sections/TechStack'
@@ -20,7 +19,6 @@ export default function App() {
         <JediPath />
         <TechStack />
         <Savings />
-        <LiveDemo />
         <DarkSide />
         <Cta />
         <Feedback />
