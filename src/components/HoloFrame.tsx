@@ -1,8 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
+import ButtonBase from '@mui/material/ButtonBase'
+import Dialog from '@mui/material/Dialog'
+import IconButton from '@mui/material/IconButton'
 import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
 import { alpha, keyframes } from '@mui/material/styles'
+import CloseIcon from '@mui/icons-material/Close'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { monoFont, neon } from '../theme'
 
 const scan = keyframes`
@@ -58,8 +63,79 @@ function LoopVideo({ base, alt }: { base: string; alt: string }) {
   )
 }
 
+// Полноэкранный просмотр: полное качество (без превью-версии), с панелью управления.
+function FullscreenVideo({ base, alt, open, onClose }: { base: string; alt: string; open: boolean; onClose: () => void }) {
+  const url = import.meta.env.BASE_URL + base
+  return (
+    <Dialog fullScreen open={open} onClose={onClose} slotProps={{ paper: { sx: { bgcolor: '#000', backgroundImage: 'none' } } }}>
+      <IconButton
+        onClick={onClose}
+        aria-label="Закрыть"
+        sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1, color: '#fff', bgcolor: 'rgba(0, 0, 0, 0.5)', '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.7)' } }}
+      >
+        <CloseIcon />
+      </IconButton>
+      <Box
+        component="video"
+        autoPlay
+        loop
+        controls
+        playsInline
+        poster={`${url}.poster.webp`}
+        aria-label={alt}
+        sx={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+      >
+        <source src={`${url}.av1.mp4`} type='video/mp4; codecs="av01.0.08M.08"' />
+        <source src={`${url}.h264.mp4`} type="video/mp4" />
+      </Box>
+    </Dialog>
+  )
+}
+
+// Слой поверх видео: на ховере затемнение и кнопка «play», по клику — полный экран.
+function PlayOverlay({ color, onClick }: { color: string; onClick: () => void }) {
+  return (
+    <ButtonBase
+      onClick={onClick}
+      aria-label="Смотреть в полном экране"
+      disableRipple
+      sx={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 3,
+        cursor: 'pointer',
+        transition: 'background-color .3s',
+        '& .play': {
+          width: 72,
+          height: 72,
+          borderRadius: '50%',
+          display: 'grid',
+          placeItems: 'center',
+          color: '#fff',
+          bgcolor: alpha(color, 0.25),
+          border: `2px solid ${color}`,
+          boxShadow: `0 0 24px ${alpha(color, 0.6)}`,
+          backdropFilter: 'blur(4px)',
+          opacity: 0,
+          transform: 'scale(.8)',
+          transition: 'opacity .3s, transform .3s',
+        },
+        '&:hover, &.Mui-focusVisible': { bgcolor: 'rgba(0, 0, 0, 0.35)' },
+        '&:hover .play, &.Mui-focusVisible .play': { opacity: 1, transform: 'scale(1)' },
+        // На тач-устройствах ховера нет — кнопку показываем всегда, но приглушённо.
+        '@media (hover: none)': { '& .play': { opacity: 0.7, transform: 'scale(.7)' } },
+      }}
+    >
+      <Box className="play">
+        <PlayArrowIcon sx={{ fontSize: 40 }} />
+      </Box>
+    </ButtonBase>
+  )
+}
+
 // «Голографическая» рамка: сетка + свечение. Без src/video показывает скелетон.
 export default function HoloFrame({ src, video, ratio = '16 / 10', phone, alt, color = neon.blue, label = 'GIF скоро' }: Props) {
+  const [fullscreen, setFullscreen] = useState(false)
   return (
     <Box
       sx={{
@@ -93,7 +169,11 @@ export default function HoloFrame({ src, video, ratio = '16 / 10', phone, alt, c
       }}
     >
       {video ? (
-        <LoopVideo base={video} alt={alt} />
+        <>
+          <LoopVideo base={video} alt={alt} />
+          <PlayOverlay color={color} onClick={() => setFullscreen(true)} />
+          <FullscreenVideo base={video} alt={alt} open={fullscreen} onClose={() => setFullscreen(false)} />
+        </>
       ) : src ? (
         <Box
           component="img"
