@@ -16,12 +16,6 @@ const route = [
   [30, 30], [150, 80], [60, 135], [160, 190], [90, 245],
 ] as const
 
-// Широкий горизонтальный кадр (например 1920×1072) с мелким текстом — без ограничения ширины.
-const isWide = (ratio?: string) => {
-  const [w, h] = (ratio ?? '').split('/').map(Number)
-  return w / h > 1.3
-}
-
 function RouteMap({ active }: { active: number }) {
   const all = route.map((p) => p.join(',')).join(' ')
   const done = route.slice(0, active + 1).map((p) => p.join(',')).join(' ')
@@ -154,9 +148,9 @@ export default function JediPath() {
                     <Chip label={s.system} size="small" variant="outlined" color="primary" sx={{ fontFamily: monoFont }} />
                   </Box>
                   {/* Рамку показываем только когда есть медиа — без пустых заглушек.
-                      Запись с телефона — по центру в корпусе смартфона, широкие видео на всю колонку, остальные до 600px. */}
+                      Запись с телефона — по центру в корпусе смартфона, остальное на всю колонку. */}
                   {(s.gif || s.video) && (
-                    <Box sx={s.phone ? { width: { xs: 240, md: 280 }, mx: 'auto', mb: 2.5 } : s.video ? { maxWidth: isWide(s.ratio) ? 'none' : 600, mb: 1.5 } : { mb: 1.5 }}>
+                    <Box sx={s.phone ? { width: { xs: 240, md: 280 }, mx: 'auto', mb: 2.5 } : { mb: 1.5 }}>
                       <HoloFrame src={s.gif} video={s.video} ratio={s.ratio} phone={s.phone} alt={s.title} color={i === active ? neon.green : neon.blue} />
                     </Box>
                   )}
