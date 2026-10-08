@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography'
 import { alpha, keyframes } from '@mui/material/styles'
 import CloseIcon from '@mui/icons-material/Close'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import { emit } from '../lib/analytics'
 import { monoFont, neon } from '../theme'
 
 const scan = keyframes`
@@ -136,6 +137,18 @@ function PlayOverlay({ color, onClick }: { color: string; onClick: () => void })
 // «Голографическая» рамка: сетка + свечение. Без src/video показывает скелетон.
 export default function HoloFrame({ src, video, ratio = '16 / 10', phone, alt, color = neon.blue, label = 'GIF скоро' }: Props) {
   const [fullscreen, setFullscreen] = useState(false)
+  const openedAt = useRef(0)
+  const videoName = video?.split('/').pop() ?? ''
+
+  const open = () => {
+    openedAt.current = performance.now()
+    setFullscreen(true)
+    emit('video_open', { video: videoName, step_title: alt })
+  }
+  const close = () => {
+    setFullscreen(false)
+    emit('video_close', { video: videoName, step_title: alt, seconds_watched: Math.round((performance.now() - openedAt.current) / 1000) })
+  }
   return (
     <Box
       sx={{
@@ -171,8 +184,8 @@ export default function HoloFrame({ src, video, ratio = '16 / 10', phone, alt, c
       {video ? (
         <>
           <LoopVideo base={video} alt={alt} />
-          <PlayOverlay color={color} onClick={() => setFullscreen(true)} />
-          <FullscreenVideo base={video} alt={alt} open={fullscreen} onClose={() => setFullscreen(false)} />
+          <PlayOverlay color={color} onClick={open} />
+          <FullscreenVideo base={video} alt={alt} open={fullscreen} onClose={close} />
         </>
       ) : src ? (
         <Box

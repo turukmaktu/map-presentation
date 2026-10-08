@@ -8,10 +8,12 @@ import '@fontsource/jetbrains-mono/700.css'
 import '@fontsource/jetbrains-mono/800.css'
 import '@fontsource-variable/inter'
 import App from './App.tsx'
+import { setupAnalytics } from './lib/analytics'
 import { printEasterEgg } from './lib/easterEgg'
 import { theme } from './theme'
 
 printEasterEgg()
+setupAnalytics()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

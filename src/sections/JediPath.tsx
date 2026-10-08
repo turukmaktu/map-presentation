@@ -9,6 +9,7 @@ import { motion } from 'motion/react'
 import HoloFrame from '../components/HoloFrame'
 import Section from '../components/Section'
 import { steps } from '../content'
+import { emit, emitOnce } from '../lib/analytics'
 import { glow, monoFont, neon } from '../theme'
 
 // Точки маршрута на мини-карте — по одной на этап.
@@ -48,7 +49,10 @@ export default function JediPath() {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.index))
+          if (!e.isIntersecting) continue
+          const i = Number((e.target as HTMLElement).dataset.index)
+          setActive(i)
+          emitOnce(`step:${i}`, 'step_view', { step_number: i + 1, step_title: steps[i].title, step_system: steps[i].system })
         }
       },
       { rootMargin: '-45% 0px -45% 0px' },
@@ -71,6 +75,7 @@ export default function JediPath() {
                 key={s.title}
                 component="a"
                 href={`#step-${i + 1}`}
+                onClick={() => emit('step_nav_click', { step_number: i + 1, step_title: s.title })}
                 sx={{
                   display: 'flex',
                   gap: 1.5,

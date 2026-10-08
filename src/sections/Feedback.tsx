@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type FocusEvent, type FormEvent } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 import SendIcon from '@mui/icons-material/Send'
 import Section from '../components/Section'
 import { feedbackTopics, type FeedbackTopic } from '../content'
+import { emit, emitOnce, type FormErrorType, type FormSource } from '../lib/analytics'
 import { onFeedbackRequest } from '../lib/feedbackBus'
 import { getRecaptchaToken, loadRecaptcha } from '../lib/recaptcha'
 
@@ -39,14 +40,37 @@ export default function Feedback() {
   const [consent, setConsent] = useState(false)
   const [touched, setTouched] = useState(false)
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
+  // Для аналитики: какая кнопка привела в форму и когда начали заполнять.
+  const source = useRef<FormSource>('direct')
+  const startedAt = useRef<number | null>(null)
 
-  useEffect(() => onFeedbackRequest((topic) => setForm((f) => ({ ...f, topic }))), [])
+  useEffect(
+    () =>
+      onFeedbackRequest(({ topic, source: from }) => {
+        source.current = from
+        setForm((f) => ({ ...f, topic }))
+      }),
+    [],
+  )
 
   useEffect(() => {
     if (siteKey) loadRecaptcha(siteKey).catch(() => {})
   }, [])
 
   const set = (key: keyof Form) => (e: ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [key]: e.target.value }))
+
+  const changeTopic = (e: ChangeEvent<HTMLInputElement>) => {
+    set('topic')(e)
+    emit('form_topic_change', { topic: e.target.value as FeedbackTopic })
+  }
+
+  // Первый фокус в любом поле формы — начало заполнения.
+  function onFocus(e: FocusEvent<HTMLFormElement>) {
+    if (startedAt.current !== null) return
+    startedAt.current = performance.now()
+    const field = (e.target as HTMLElement).closest<HTMLElement>('[data-field]')?.dataset.field ?? 'other'
+    emitOnce('form_start', 'form_start', { topic: form.topic, form_source: source.current, first_field: field })
+  }
 
   const errors = {
     name: !form.name.trim() ? 'Как к вам обращаться?' : '',
@@ -58,11 +82,20 @@ export default function Feedback() {
   async function submit(e: FormEvent) {
     e.preventDefault()
     setTouched(true)
-    if (!valid || !configured) return
+    if (!valid) {
+      const fields = [...Object.entries(errors).filter(([, msg]) => msg).map(([key]) => key), ...(consent ? [] : ['consent'])]
+      emit('form_validation_error', { fields: fields.join(',') })
+      return
+    }
+    if (!configured) return
 
+    const { topic } = form
+    emit('form_submit', { topic, form_source: source.current, has_company: Boolean(form.company.trim()), message_length: form.message.trim().length })
     setStatus({ kind: 'sending' })
+    let stage: FormErrorType = 'captcha'
     try {
       const token = await getRecaptchaToken(siteKey!, 'feedback')
+      stage = 'network'
       // text/plain — «простой» запрос без CORS-preflight, который Apps Script не поддерживает
       const res = await fetch(endpoint!, {
         method: 'POST',
@@ -70,12 +103,21 @@ export default function Feedback() {
         body: JSON.stringify({ ...form, token, page: location.href }),
       })
       const data: { ok: boolean; error?: string } = await res.json()
+      if (!data.ok) stage = data.error === 'captcha' ? 'captcha' : 'server'
       if (!data.ok) throw new Error(data.error === 'captcha' ? 'Проверка reCAPTCHA не пройдена. Попробуйте ещё раз.' : 'Сервер не принял заявку.')
+      emit('form_success', {
+        topic,
+        form_source: source.current,
+        seconds_to_complete: startedAt.current === null ? 0 : Math.round((performance.now() - startedAt.current) / 1000),
+      })
+      // Повторная заявка считается от момента предыдущей отправки.
+      startedAt.current = performance.now()
       setStatus({ kind: 'sent' })
       setForm(empty)
       setConsent(false)
       setTouched(false)
     } catch (err) {
+      emit('form_submit_error', { topic, error_type: stage })
       setStatus({ kind: 'error', message: err instanceof Error ? err.message : 'Что-то пошло не так.' })
     }
   }
@@ -84,7 +126,7 @@ export default function Feedback() {
 
   return (
     <Section id="feedback" overline="Обратная связь" title="Связаться с джедаем">
-      <Paper component="form" noValidate onSubmit={submit} sx={{ p: { xs: 2.5, md: 4 }, maxWidth: 820, mx: 'auto' }}>
+      <Paper component="form" noValidate onSubmit={submit} onFocus={onFocus} sx={{ p: { xs: 2.5, md: 4 }, maxWidth: 820, mx: 'auto' }}>
         {!configured && (
           <Alert severity="info" sx={{ mb: 3 }}>
             Форма ещё не подключена: задайте VITE_RECAPTCHA_SITE_KEY и VITE_FEEDBACK_ENDPOINT.
@@ -102,17 +144,17 @@ export default function Feedback() {
         )}
 
         <Grid container spacing={2.5}>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }} data-field="name">
             <TextField label="Имя" required fullWidth value={form.name} onChange={set('name')} error={!!show(errors.name)} helperText={show(errors.name)} slotProps={{ htmlInput: { maxLength: 100 } }} />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }} data-field="contact">
             <TextField label="Контакт" required fullWidth value={form.contact} onChange={set('contact')} error={!!show(errors.contact)} helperText={show(errors.contact) ?? 'Email, телефон или Telegram'} slotProps={{ htmlInput: { maxLength: 200 } }} />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }} data-field="company">
             <TextField label="Компания" fullWidth value={form.company} onChange={set('company')} slotProps={{ htmlInput: { maxLength: 200 } }} />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField select label="Тема" fullWidth value={form.topic} onChange={set('topic')}>
+          <Grid size={{ xs: 12, sm: 6 }} data-field="topic">
+            <TextField select label="Тема" fullWidth value={form.topic} onChange={changeTopic}>
               {feedbackTopics.map((t) => (
                 <MenuItem key={t} value={t}>
                   {t}
@@ -120,7 +162,7 @@ export default function Feedback() {
               ))}
             </TextField>
           </Grid>
-          <Grid size={12}>
+          <Grid size={12} data-field="message">
             <TextField label="Сообщение" required fullWidth multiline minRows={4} value={form.message} onChange={set('message')} error={!!show(errors.message)} helperText={show(errors.message)} slotProps={{ htmlInput: { maxLength: 5000 } }} />
           </Grid>
         </Grid>
@@ -130,6 +172,7 @@ export default function Feedback() {
         </Box>
 
         <FormControlLabel
+          data-field="consent"
           sx={{ mt: 2 }}
           control={<Checkbox checked={consent} onChange={(e) => setConsent(e.target.checked)} />}
           label={

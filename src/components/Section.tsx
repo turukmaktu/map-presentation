@@ -3,10 +3,11 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import { motion } from 'motion/react'
+import { trackSection, type SectionId } from '../lib/analytics'
 import SaberDivider from './SaberDivider'
 
 type Props = {
-  id: string
+  id: SectionId
   overline?: string
   title?: ReactNode
   color?: string
@@ -15,7 +16,7 @@ type Props = {
 
 export default function Section({ id, overline, title, color, children }: Props) {
   return (
-    <Box component="section" id={id} sx={{ py: { xs: 8, md: 12 }, scrollMarginTop: 24 }}>
+    <Box component="section" id={id} ref={trackSection(id, overline ?? id)} sx={{ py: { xs: 8, md: 12 }, scrollMarginTop: 24 }}>
       <Container maxWidth="lg">
         {(overline || title) && (
           <motion.div

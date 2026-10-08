@@ -10,6 +10,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { motion } from 'motion/react'
 import Terminal from '../components/Terminal'
 import { hero } from '../content'
+import { emit, trackSection } from '../lib/analytics'
 import { requestFeedback } from '../lib/feedbackBus'
 import { glow, neon } from '../theme'
 
@@ -25,6 +26,7 @@ export default function Hero() {
   return (
     <Box
       component="header"
+      ref={trackSection('hero', 'Первый экран')}
       sx={{
         position: 'relative',
         minHeight: '100svh',
@@ -59,10 +61,24 @@ export default function Hero() {
               </Typography>
               <Typography sx={{ color: 'text.secondary', mb: 4, maxWidth: 520, fontSize: '1.05rem' }}>{hero.subtitle}</Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button variant="contained" size="large" startIcon={<BoltIcon />} onClick={() => requestFeedback('Запросить демо')}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<BoltIcon />}
+                  onClick={() => {
+                    emit('cta_click', { cta_location: 'hero', cta_text: 'Почувствовать силу', topic: 'Запросить демо' })
+                    requestFeedback('Запросить демо', 'hero')
+                  }}
+                >
                   Почувствовать силу
                 </Button>
-                <Button variant="outlined" size="large" endIcon={<KeyboardArrowDownIcon />} href="#path">
+                <Button
+                  variant="outlined"
+                  size="large"
+                  endIcon={<KeyboardArrowDownIcon />}
+                  href="#path"
+                  onClick={() => emit('cta_click', { cta_location: 'hero', cta_text: 'Смотреть как работает' })}
+                >
                   Смотреть как работает
                 </Button>
               </Stack>
