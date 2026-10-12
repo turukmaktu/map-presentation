@@ -72,6 +72,14 @@ export const steps: { system: string; title: string; text: string; gif?: string;
     video: 'videos/order-bridge',
     ratio: '1920 / 1072',
   },
+  {
+    system: 'Telegram',
+    title: 'Последний урок: заказ голосом',
+    text: 'Высший уровень владения Силой — просто сказать, чего хочешь. Клиент наговаривает заказ боту, тот сам разбирает адрес, товары и время и создаёт заказ — с той же зоной и ценой. Telegram — лишь пример: этот дроид встроится в любой мессенджер или вашего бота.',
+    video: 'videos/voice-order-bot',
+    ratio: '1080 / 2400',
+    phone: true,
+  },
 ]
 
 export const stack = [
