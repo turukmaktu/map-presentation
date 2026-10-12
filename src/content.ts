@@ -31,6 +31,13 @@ export const problems = [
 export const steps: { system: string; title: string; text: string; gif?: string; video?: string; ratio?: string; phone?: boolean }[] = [
   {
     system: 'Bitrix',
+    title: 'Орден чертит границы Республики',
+    text: 'Мастер-джедай делит карту на зоны доставки и назначает каждой свою цену. Клиент видит стоимость сразу при заказе — никаких торгов, как на Татуине.',
+    video: 'videos/define-zones',
+    ratio: '1204 / 1070',
+  },
+  {
+    system: 'Bitrix',
     title: 'Зов Силы: заказ на сайте',
     text: 'Клиент оформляет заказ в Bitrix-шаблоне на React/MUI. CMS работает как прежде — баланс Силы не нарушен.',
     video: 'videos/order-site',
