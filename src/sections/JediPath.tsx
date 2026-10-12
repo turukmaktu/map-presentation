@@ -12,10 +12,12 @@ import { steps } from '../content'
 import { emit, emitOnce } from '../lib/analytics'
 import { glow, monoFont, neon } from '../theme'
 
-// Точки маршрута на мини-карте — по одной на этап.
-const route = [
-  [30, 30], [150, 80], [60, 135], [160, 190], [90, 245],
-] as const
+// Точки маршрута на мини-карте — по одной на этап: зигзаг сверху вниз, число точек = числу шагов.
+const zigzagX = [30, 150, 60, 160, 90, 140]
+const route = steps.map((_, i) => [
+  zigzagX[i % zigzagX.length],
+  Math.round(30 + (i * 215) / Math.max(steps.length - 1, 1)),
+] as const)
 
 function RouteMap({ active }: { active: number }) {
   const all = route.map((p) => p.join(',')).join(' ')
